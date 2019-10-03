@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="HighlighterOptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,4 +73,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"%25ProgramFiles(x86)%25\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools\gacutil.exe" /f /i "$(TargetDir)$(TargetFileName)"
+
+"%25windir%25\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" /unregister "$(TargetDir)$(TargetFileName)"
+
+"%25windir%25\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" "$(TargetDir)$(TargetFileName)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

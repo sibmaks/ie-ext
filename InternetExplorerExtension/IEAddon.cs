@@ -14,7 +14,7 @@ namespace InternetExplorerExtension
     [ProgId("MyBHO.WordHighlighter")]
     public class WordHighlighterBHO : IObjectWithSite, IOleCommandTarget
     {
-        const string DefaultTextToHighlight = "browser";
+        const string DefaultTextToHighlight = "strony";
 
         IWebBrowser2 browser;
         private object site;
@@ -60,9 +60,7 @@ namespace InternetExplorerExtension
                         var x = (IHTMLDOMChildrenCollection)(domNode.childNodes);
                         foreach (IHTMLDOMNode eachChild in x)
                         {
-                            if (eachChild is mshtml.IHTMLScriptElement)
-                                continue;
-                            if (eachChild is mshtml.IHTMLStyleElement)
+                            if (eachChild is mshtml.IHTMLScriptElement || eachChild is mshtml.IHTMLStyleElement)                                
                                 continue;
 
                             queue.Enqueue(eachChild);
