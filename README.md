@@ -13,6 +13,7 @@ In the project properties, do the following:
 "%windir%\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" /unregister "$(TargetDir)$(TargetFileName)"
 
 "%windir%\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" "$(TargetDir)$(TargetFileName)"
+
 Attention: even though my computer is x64, I used the path of the non-x64 gacutil.exe and it worked... the one specific for x64 is at:
 
 C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools\x64\gacutil.exe
