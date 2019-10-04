@@ -14,12 +14,13 @@ namespace InternetExplorerExtension
     [ProgId("MyBHO.WordHighlighter")]
     public class WordHighlighterBHO : IObjectWithSite, IOleCommandTarget
     {
-        const string DefaultTextToHighlight = "strony";
+        const string DefaultTextToHighlight = "Widok";
 
         IWebBrowser2 browser;
         private object site;
 
         #region Highlight Text
+        //This execute in while??
         void OnDocumentComplete(object pDisp, ref object URL)
         {
             try
@@ -29,44 +30,50 @@ namespace InternetExplorerExtension
                 //if (pDisp != this.site)
                 //    return;
 
+                //MessageBox.Show("Bho is working");
+
                 var document2 = browser.Document as IHTMLDocument2;
                 var document3 = browser.Document as IHTMLDocument3;
 
                 var window = document2.parentWindow;
                 window.execScript(@"function FncAddedByAddon() { alert('Message added by addon.'); }");
 
-                Queue<IHTMLDOMNode> queue = new Queue<IHTMLDOMNode>();
-                foreach (IHTMLDOMNode eachChild in document3.childNodes)
-                    queue.Enqueue(eachChild);
 
-                while (queue.Count > 0)
-                {
-                    // replacing desired text with a highlighted version of it
-                    var domNode = queue.Dequeue();
+                //Queue<IHTMLDOMNode> queue = new Queue<IHTMLDOMNode>();
+                //foreach (IHTMLDOMNode eachChild in document3.childNodes)
+                //    queue.Enqueue(eachChild);
 
-                    if (domNode is IHTMLDOMTextNode textNode)
-                    {
-                        if (textNode.data.Contains(TextToHighlight))
-                        {
-                            var newText = textNode.data.Replace(TextToHighlight, "<span style='background-color: yellow; cursor: hand;' onclick='javascript:FncAddedByAddon()' title='Click to open script based alert window.'>" + TextToHighlight + "</span>");
-                            var newNode = document2.createElement("span");
-                            newNode.innerHTML = newText;
-                            domNode.replaceNode((IHTMLDOMNode)newNode);
-                        }
-                    }
-                    else
-                    {
-                        // adding children to collection
-                        var x = (IHTMLDOMChildrenCollection)(domNode.childNodes);
-                        foreach (IHTMLDOMNode eachChild in x)
-                        {
-                            if (eachChild is mshtml.IHTMLScriptElement || eachChild is mshtml.IHTMLStyleElement)                                
-                                continue;
+                //while (queue.Count > 0)
+                //{
+                //    // replacing desired text with a highlighted version of it
+                //    var domNode = queue.Dequeue();
 
-                            queue.Enqueue(eachChild);
-                        }
-                    }
-                }
+                //    if (domNode is IHTMLDOMTextNode textNode)
+                //    {
+                //        if (textNode.data.Contains(TextToHighlight))
+                //        {
+                //            var newText = textNode.data.Replace(TextToHighlight, "<span style='background-color: yellow; cursor: hand;' onclick='javascript:FncAddedByAddon()' title='Click to open script based alert window.'>" + TextToHighlight + "</span>");
+                //            var newNode = document2.createElement("span");
+                //            newNode.innerHTML = newText;
+                //            domNode.replaceNode((IHTMLDOMNode)newNode);
+                //        }
+                //    }
+                //    else
+                //    {
+                //        // adding children to collection
+                //        var x = (IHTMLDOMChildrenCollection)(domNode.childNodes);
+                //        foreach (IHTMLDOMNode eachChild in x)
+                //        {
+                //            if (eachChild is mshtml.IHTMLScriptElement || eachChild is mshtml.IHTMLStyleElement)                                
+                //                continue;
+
+                //            queue.Enqueue(eachChild);
+                //        }
+                //    }
+                //}
+
+
+
             }
             catch (Exception ex)
             {
@@ -182,6 +189,8 @@ namespace InternetExplorerExtension
         {
             return 0;
         }
+
+        //This execute after clicking on 
         int IOleCommandTarget.Exec(IntPtr pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             try
@@ -189,17 +198,21 @@ namespace InternetExplorerExtension
                 // Accessing the document from the command-bar.
                 var document = browser.Document as IHTMLDocument2;
                 var window = document.parentWindow;
-                var result = window.execScript(@"alert('You will now be allowed to configure the text to highlight...');");
 
-                var form = new HighlighterOptionsForm
-                {
-                    InputText = TextToHighlight
-                };
-                if (form.ShowDialog() != DialogResult.Cancel)
-                {
-                    TextToHighlight = form.InputText;
-                    SaveOptions();
-                }
+                ExecJavaScript(document);
+                
+
+
+                MessageBox.Show("Extension is working");
+                //var form = new HighlighterOptionsForm
+                //{
+                //    InputText = TextToHighlight
+                //};
+                //if (form.ShowDialog() != DialogResult.Cancel)
+                //{
+                //    TextToHighlight = form.InputText;
+                //    SaveOptions();
+                //}
             }
             catch (Exception ex)
             {
@@ -207,6 +220,12 @@ namespace InternetExplorerExtension
             }
 
             return 0;
+        }
+        //Here put JS script
+        private void ExecJavaScript(IHTMLDocument2 document)
+        {
+            var window = document.parentWindow;
+            var result = window.execScript(@"alert('You will now be allowed to configure the text to highlight...');");
         }
         #endregion
 
@@ -240,14 +259,14 @@ namespace InternetExplorerExtension
                 RegistryKey key = registryKey.OpenSubKey(guid);
                 if (key == null)
                     key = registryKey.CreateSubKey(guid);
-                key.SetValue("ButtonText", "Highlighter options");
+                key.SetValue("ButtonText", "Extension options");
                 key.SetValue("CLSID", "{1FBA04EE-3024-11d2-8F1F-0000F87ABD16}");
                 key.SetValue("ClsidExtension", guid);
-                key.SetValue("Icon", "");
-                key.SetValue("HotIcon", "");
+                key.SetValue("Icon", "icon.ico");
+                key.SetValue("HotIcon", "icon.ico");
                 key.SetValue("Default Visible", "Yes");
-                key.SetValue("MenuText", "&Highlighter options");
-                key.SetValue("ToolTip", "Highlighter options");
+                key.SetValue("MenuText", "&Extension options");
+                key.SetValue("ToolTip", "Extension tooltip");
                 //key.SetValue("KeyPath", "no");
                 registryKey.Close();
                 key.Close();

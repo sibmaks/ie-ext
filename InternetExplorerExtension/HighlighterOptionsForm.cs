@@ -13,5 +13,10 @@ namespace InternetExplorerExtension
             get { return this.textBox1.Text; }
             set { this.textBox1.Text = value; }
         }
+
+        private void Button2_Click(object sender, System.EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
