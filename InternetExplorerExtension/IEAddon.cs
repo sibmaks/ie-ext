@@ -199,20 +199,18 @@ namespace InternetExplorerExtension
                 var document = browser.Document as IHTMLDocument2;
                 var window = document.parentWindow;
 
+                //Execute JavaScript here
                 ExecJavaScript(document);
                 
 
-
-                MessageBox.Show("Extension is working");
-                //var form = new HighlighterOptionsForm
-                //{
-                //    InputText = TextToHighlight
-                //};
-                //if (form.ShowDialog() != DialogResult.Cancel)
-                //{
-                //    TextToHighlight = form.InputText;
-                //    SaveOptions();
-                //}
+                //Test msg
+                //MessageBox.Show("Extension is working");
+                var form = new HighlighterOptionsForm                ();
+                if (form.ShowDialog() != DialogResult.Cancel)
+                {
+                    
+                    SaveOptions();
+                }
             }
             catch (Exception ex)
             {
@@ -225,7 +223,11 @@ namespace InternetExplorerExtension
         private void ExecJavaScript(IHTMLDocument2 document)
         {
             var window = document.parentWindow;
-            var result = window.execScript(@"alert('You will now be allowed to configure the text to highlight...');");
+            //var result = window.execScript(@"alert('You will now be allowed to configure the text to highlight...');");
+
+
+
+
         }
         #endregion
 
