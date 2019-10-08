@@ -8,6 +8,11 @@ namespace InternetExplorerExtension
         {
             InitializeComponent();
 
+
+
+            //enable js
+            webBrowser1.ScriptErrorsSuppressed = true;
+
             SetAsWindowSize();
         }
 
@@ -37,7 +42,10 @@ namespace InternetExplorerExtension
 
         private void HighlighterOptionsForm_Load(object sender, EventArgs e)
         {
-                 var htmlinject = @"<html><body style='background-color: green;'>Please enter your name:<br/><input type='text' name='userName'/><br/><a href='@\xd.html'>continue</a></body></html>";
+            
+        
+
+              var htmlinject = @"<html><body style='background-color: green;'>Please enter your name:<br/><br/><a href='@\xd.html'></a></body></html>";
 
 
 
@@ -50,10 +58,10 @@ namespace InternetExplorerExtension
             //var str = "<html><head></head><body>" + sender.ToString() + "</body></html>";
             //webBrowser1.DocumentText = str;
             webBrowser1.Document.OpenNew(true).Write(htmlinject);
+            
+            webBrowser1.Url = new Uri("file:///C:/Users/ADMIN/Desktop/webowka/react learn/site/spawacz/public/index.html");
 
-
-
-            MessageBox.Show(webBrowser1.DocumentText.ToString());
+            //MessageBox.Show();
         }
     }
 }
