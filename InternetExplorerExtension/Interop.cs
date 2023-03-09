@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-namespace InternetExplorerExtension
+
+namespace IEExt
 {
     [ComVisible(true)]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -8,9 +9,9 @@ namespace InternetExplorerExtension
     public interface IObjectWithSite
     {
         [PreserveSig]
-        int SetSite([MarshalAs(UnmanagedType.IUnknown)]object site);
+        int SetSite([MarshalAs(UnmanagedType.IUnknown)] object site);
         [PreserveSig]
-        int GetSite(ref Guid guid, [MarshalAs(UnmanagedType.IUnknown)]out IntPtr ppvSite);
+        int GetSite(ref Guid guid, [MarshalAs(UnmanagedType.IUnknown)] out IntPtr ppvSite);
     }
 
 

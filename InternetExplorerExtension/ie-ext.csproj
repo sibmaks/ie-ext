@@ -7,8 +7,8 @@
     <ProjectGuid>{B0840AA3-9154-4972-99E1-D557B72D6F0F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>InternetExplorerExtension</RootNamespace>
-    <AssemblyName>InternetExplorerExtension</AssemblyName>
+    <RootNamespace>IEExt</RootNamespace>
+    <AssemblyName>ie-extenstion</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -34,7 +34,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>klucz.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>ie-sign.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -55,12 +55,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HighlighterOptionsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HighlighterOptionsForm.Designer.cs">
-      <DependentUpon>HighlighterOptionsForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="IEAddon.cs" />
     <Compile Include="Interop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,21 +76,17 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HighlighterOptionsForm.resx">
-      <DependentUpon>HighlighterOptionsForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="klucz.snk" />
+    <Content Include="emulator.js" />
+    <Content Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="xd.html" />
-    <Content Include="icon.ico" />
-    <Content Include="Tetst.js" />
+    <None Include="ie-sign.pfx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -105,5 +95,9 @@
 "%25windir%25\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" /unregister "$(TargetDir)$(TargetFileName)"
 
 "%25windir%25\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" "$(TargetDir)$(TargetFileName)"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

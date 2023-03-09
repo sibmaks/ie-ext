@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.489
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternetExplorerExtension", "InternetExplorerExtension\InternetExplorerExtension.csproj", "{B0840AA3-9154-4972-99E1-D557B72D6F0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ie-ext", "InternetExplorerExtension\ie-ext.csproj", "{B0840AA3-9154-4972-99E1-D557B72D6F0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

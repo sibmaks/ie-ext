@@ -1,80 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using IEExt.Properties;
 using Microsoft.Win32;
 using mshtml;
 using SHDocVw;
 
-namespace InternetExplorerExtension
+namespace IEExt
 {
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.None)]
     [Guid("D40C654D-7C51-4EB3-95B2-1E23905C2A2D")]
-    [ProgId("MyBHO.WordHighlighter")]
-    public class WordHighlighterBHO : IObjectWithSite, IOleCommandTarget
+    [ProgId("MyBHO.ActiveXInjector")]
+    public class ActiveXInjectorBHO : IObjectWithSite
     {
-        const string DefaultTextToHighlight = "Widok";
-
         IWebBrowser2 browser;
         private object site;
 
-        #region Highlight Text
-
-        //This execute in while care with using this function, can break IE XD
+        #region ActiveX Injector
         void OnDocumentComplete(object pDisp, ref object URL)
         {
             try
             {
-                // @Eric Stob: Thanks for this hint!
-                // This was used to prevent this method being executed more than once in IE8... but now it seems to not work anymore.
-                //if (pDisp != this.site)
-                //    return;
-
-                //MessageBox.Show("Bho is working");
-
                 var document2 = browser.Document as IHTMLDocument2;
-                var document3 = browser.Document as IHTMLDocument3;
-
                 var window = document2.parentWindow;
-                window.execScript(@"function FncAddedByAddon() { alert('Message added by addon.'); }");
-
-
-                //Queue<IHTMLDOMNode> queue = new Queue<IHTMLDOMNode>();
-                //foreach (IHTMLDOMNode eachChild in document3.childNodes)
-                //    queue.Enqueue(eachChild);
-
-                //while (queue.Count > 0)
-                //{
-                //    // replacing desired text with a highlighted version of it
-                //    var domNode = queue.Dequeue();
-
-                //    if (domNode is IHTMLDOMTextNode textNode)
-                //    {
-                //        if (textNode.data.Contains(TextToHighlight))
-                //        {
-                //            var newText = textNode.data.Replace(TextToHighlight, "<span style='background-color: yellow; cursor: hand;' onclick='javascript:FncAddedByAddon()' title='Click to open script based alert window.'>" + TextToHighlight + "</span>");
-                //            var newNode = document2.createElement("span");
-                //            newNode.innerHTML = newText;
-                //            domNode.replaceNode((IHTMLDOMNode)newNode);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        // adding children to collection
-                //        var x = (IHTMLDOMChildrenCollection)(domNode.childNodes);
-                //        foreach (IHTMLDOMNode eachChild in x)
-                //        {
-                //            if (eachChild is mshtml.IHTMLScriptElement || eachChild is mshtml.IHTMLStyleElement)                                
-                //                continue;
-
-                //            queue.Enqueue(eachChild);
-                //        }
-                //    }
-                //}
-
-
-
+                window.execScript(Resources.emulator);
             }
             catch (Exception ex)
             {
@@ -83,64 +33,11 @@ namespace InternetExplorerExtension
         }
         #endregion
         #region Load and Save Data
-        static string TextToHighlight = DefaultTextToHighlight;
-        public static string RegData = "Software\\MyIEExtension";
+        public static string RegData = "Software\\ActiveXInjector";
 
         [DllImport("ieframe.dll")]
         public static extern int IEGetWriteableHKCU(ref IntPtr phKey);
 
-        private static void SaveOptions()
-        {
-            // In IE 7,8,9,(desktop)10 tabs run in Protected Mode
-            // which prohibits writes to HKLM, HKCU.
-            // Must ask IE for "Writable" registry section pointer
-            // which will be something like HKU/S-1-7***/Software/AppDataLow/
-            // In "metro" IE 10 mode, tabs run in "Enhanced Protected Mode"
-            // where BHOs are not allowed to run, except in edge cases.
-            // see http://blogs.msdn.com/b/ieinternals/archive/2012/03/23/understanding-ie10-enhanced-protected-mode-network-security-addons-cookies-metro-desktop.aspx
-            IntPtr phKey = new IntPtr();
-            var answer = IEGetWriteableHKCU(ref phKey);
-            RegistryKey writeable_registry = RegistryKey.FromHandle(
-                new Microsoft.Win32.SafeHandles.SafeRegistryHandle(phKey, true)
-            );
-            RegistryKey registryKey = writeable_registry.OpenSubKey(RegData, true);
-
-            if (registryKey == null)
-                registryKey = writeable_registry.CreateSubKey(RegData);
-            registryKey.SetValue("Data", TextToHighlight);
-
-            writeable_registry.Close();
-        }
-        private static void LoadOptions()
-        {
-            // In IE 7,8,9,(desktop)10 tabs run in Protected Mode
-            // which prohibits writes to HKLM, HKCU.
-            // Must ask IE for "Writable" registry section pointer
-            // which will be something like HKU/S-1-7***/Software/AppDataLow/
-            // In "metro" IE 10 mode, tabs run in "Enhanced Protected Mode"
-            // where BHOs are not allowed to run, except in edge cases.
-            // see http://blogs.msdn.com/b/ieinternals/archive/2012/03/23/understanding-ie10-enhanced-protected-mode-network-security-addons-cookies-metro-desktop.aspx
-            IntPtr phKey = new IntPtr();
-            var answer = IEGetWriteableHKCU(ref phKey);
-            RegistryKey writeable_registry = RegistryKey.FromHandle(
-                new Microsoft.Win32.SafeHandles.SafeRegistryHandle(phKey, true)
-            );
-            RegistryKey registryKey = writeable_registry.OpenSubKey(RegData, true);
-
-            if (registryKey == null)
-                registryKey = writeable_registry.CreateSubKey(RegData);
-            registryKey.SetValue("Data", TextToHighlight);
-
-            if (registryKey == null)
-            {
-                TextToHighlight = DefaultTextToHighlight;
-            }
-            else
-            {
-                TextToHighlight = (string)registryKey.GetValue("Data");
-            }
-            writeable_registry.Close();
-        }
         #endregion
 
         [Guid("6D5140C1-7436-11CE-8034-00AA006009FA")]
@@ -157,12 +54,11 @@ namespace InternetExplorerExtension
 
             if (site != null)
             {
-                LoadOptions();
-
                 var serviceProv = (IServiceProvider)this.site;
                 var guidIWebBrowserApp = Marshal.GenerateGuidForType(typeof(IWebBrowserApp)); // new Guid("0002DF05-0000-0000-C000-000000000046");
                 var guidIWebBrowser2 = Marshal.GenerateGuidForType(typeof(IWebBrowser2)); // new Guid("D30C1661-CDAF-11D0-8A3E-00C04FC9E26E");
-                serviceProv.QueryService(ref guidIWebBrowserApp, ref guidIWebBrowser2, out IntPtr intPtr);
+                IntPtr intPtr;
+                serviceProv.QueryService(ref guidIWebBrowserApp, ref guidIWebBrowser2, out intPtr);
 
                 browser = (IWebBrowser2)Marshal.GetObjectForIUnknown(intPtr);
 
@@ -185,117 +81,6 @@ namespace InternetExplorerExtension
             return hr;
         }
         #endregion
-        #region Implementation of IOleCommandTarget
-        int IOleCommandTarget.QueryStatus(IntPtr pguidCmdGroup, uint cCmds, ref OLECMD prgCmds, IntPtr pCmdText)
-        {
-            return 0;
-        }
-
-        //This execute after clicking on 
-        int IOleCommandTarget.Exec(IntPtr pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
-        {
-            try
-            {
-
-                
-
-                // Accessing the document from the command-bar.
-                var document = browser.Document as IHTMLDocument2;
-                var window = document.parentWindow;
-
-                //Execute JavaScript here
-                ExecJavaScript(document);
-               
-
-                //MessageBox.Show("Extension is working");
-                //var form = new HighlighterOptionsForm                ();
-                //if (form.ShowDialog() != DialogResult.Cancel)
-                //{
-                    
-                //    SaveOptions();
-                //}
-            }
-            catch (Exception ex)
-            {
-                
-                MessageBox.Show($" {ex.Source}, {ex.Message}");
-            }
-
-            return 0;
-        }
-        //Here put JS script
-        private void ExecJavaScript(IHTMLDocument2 document)
-        {
-
-            // intertent explorer folder reference
-            //var IEFolder = "";
-
-            var window = document.parentWindow;
-            //new Uri("file:///C:/Users/ADMIN/Desktop/webowka/react learn/site/spawacz/public/index.html");
-            //file:///C:/Users/ADMIN/Desktop/webowka/react learn/site/spawacz/public/index.html
-
-            var result = window.execScript(@"
-            //create modal
-            var iframe = document.createElement('iframe');
-            iframe.id='randomid';
-
-
-
-
-
-            //modal start
-
-            // Get the modal
-            var modal = document.getElementById('myModal');
-
-            // Get the button that opens the modal
-            var btn = document.getElementById('myBtn');
-
-            // Get the <span> element that closes the modal
-            var span = document.getElementsByClassName('close')[0];
-
-            // When the user clicks the button, open the modal 
-            btn.onclick = function() {
-                modal.style.display = 'block';
-            }
-
-            // When the user clicks on <span> (x), close the modal
-            span.onclick = function() {
-                modal.style.display = 'none';
-            }
-
-            // When the user clicks anywhere outside of the modal, close it
-            window.onclick = function(event) {
-            if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-        }
-
-
-
-        //end modal
-        //var iframe = document.createElement('iframe');
-    
-            iframe.id='randomid';
-            iframe.style.backgroundColor = 'red';
-            //iframe.style.display = 'none';
-            iframe.style.width = '666px';
-
-
-            //iframe.src = 'http://duleekag.blogspot.com/2014/01/html-iframe-without-src-attribute.html';
-            //iframe.src = 'file:///C:/Users/ADMIN/Desktop/webowka/reactlearn/site/spawacz/public/index.html';
-
-            //document.body.appendChild(iframe);
-        
-        
-            
-
-
-
-
-            ");
-        }
-        #endregion
 
         #region Registering with regasm
         public static string RegBHO = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects";
@@ -308,37 +93,13 @@ namespace InternetExplorerExtension
 
             // BHO
             {
-                RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(RegBHO, true);
-                if (registryKey == null)
-                    registryKey = Registry.LocalMachine.CreateSubKey(RegBHO);
-                RegistryKey key = registryKey.OpenSubKey(guid);
-                if (key == null)
-                    key = registryKey.CreateSubKey(guid);
+                RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(RegBHO, true) ?? Registry.LocalMachine.CreateSubKey(RegBHO);
+                RegistryKey key = registryKey.OpenSubKey(guid) ?? registryKey.CreateSubKey(guid);
                 key.SetValue("Alright", 1);
                 registryKey.Close();
                 key.Close();
             }
 
-            // Command
-            {
-                RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(RegCmd, true);
-                if (registryKey == null)
-                    registryKey = Registry.LocalMachine.CreateSubKey(RegCmd);
-                RegistryKey key = registryKey.OpenSubKey(guid);
-                if (key == null)
-                    key = registryKey.CreateSubKey(guid);
-                key.SetValue("ButtonText", "Extension options");
-                key.SetValue("CLSID", "{1FBA04EE-3024-11d2-8F1F-0000F87ABD16}");
-                key.SetValue("ClsidExtension", guid);
-                key.SetValue("Icon", "icon.ico");
-                key.SetValue("HotIcon", "icon.ico");
-                key.SetValue("Default Visible", "Yes");
-                key.SetValue("MenuText", "&Extension options");
-                key.SetValue("ToolTip", "Extension tooltip");
-                //key.SetValue("KeyPath", "no");
-                registryKey.Close();
-                key.Close();
-            }
         }
 
         [ComUnregisterFunction]
@@ -348,14 +109,12 @@ namespace InternetExplorerExtension
             // BHO
             {
                 RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(RegBHO, true);
-                if (registryKey != null)
-                    registryKey.DeleteSubKey(guid, false);
+                registryKey?.DeleteSubKey(guid, false);
             }
             // Command
             {
                 RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(RegCmd, true);
-                if (registryKey != null)
-                    registryKey.DeleteSubKey(guid, false);
+                registryKey?.DeleteSubKey(guid, false);
             }
         }
         #endregion
